@@ -22,6 +22,7 @@ from classes.DriverHelpers.DriverHelper import *
 from Utils.ConfigManager import ConfigManager
 from copy import deepcopy
 from Utils.csvReader import CSVReader
+from classes.Components.ContextMenuComponentClass import *
 import time
 
 # def setUp():
@@ -38,7 +39,7 @@ def setupTestcase(self):
     return True
 
 
-def checkEqualAssert(f1,f2,time,measure,message=""):
+def checkEqualAssert(f1,f2,time="",measure="",message=""):
     msg = time + " " + measure + " " + message
     tcPass = " PASS<br>"
     tcFail = "<b><font color='red'> FAIL</font></b><br>"
@@ -366,12 +367,20 @@ def drilltoScreen(driver,driverHelper,pageName):
 
         cmenuLocators = sitePage.cm.getSpecificLocators(ContextMenuLocators)
         cmenuHandlers = driverHelper.waitForVisibleElementsAndChilds(cmenuLocators)
-        sitePage.cm.drillTo(driver,driverHelper,cmenuHandlers,Constants.DRILLTO)
+        try:
+            sitePage.cm.drillTo(driver,driverHelper,cmenuHandlers,Constants.DRILLTO)
+        except Exception:
+            return Exception
 
         drillLocators = sitePage.cm.getSpecificLocators(DrillToLocators)
         drillHandlers = driverHelper.waitForVisibleElementsAndChilds(drillLocators)
-        sitePage.cm.drillTo(driver,driverHelper,drillHandlers,pageName)
-        time.sleep(3)
+
+        if(sitePage.cm.drillTo(driver,driverHelper,drillHandlers,pageName) == True):
+            pass
+        else:
+            return sitePage.cm.drillTo(driver,driverHelper,drillHandlers,pageName)
+
+        # time.sleep(3)
 
         logger.debug('Page Launched : %s',pageName)
         return True
